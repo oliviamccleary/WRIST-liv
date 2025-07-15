@@ -18,17 +18,24 @@
   ],
   "concept": [
     {
-      "name": "New Item",
+      "name": "Parent",
       "mro": "M",
-      "description": "",
+      "description": "<p>This is a parent item</p>",
       "valueSets": "",
-      "implementationGuidance": "",
+      "implementationGuidance": "<p>Use this like this</p>",
       "informationType": "Record",
       "type": "item",
       "minimumMultiplicity": "0",
       "maximumMultiplicity": "1",
       "concept": [],
-      "relationshipType": "neither"
+      "relationshipType": "specialisation",
+      "derivedFrom": "",
+      "isComponent": false,
+      "valueDomain": [
+        {
+          "type": "CD"
+        }
+      ]
     },
     {
       "name": "Item",
