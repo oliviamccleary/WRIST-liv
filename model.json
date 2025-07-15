@@ -27,7 +27,21 @@
       "type": "item",
       "minimumMultiplicity": "0",
       "maximumMultiplicity": "1",
-      "concept": [],
+      "concept": [
+        {
+          "name": "New Item",
+          "mro": "M",
+          "description": "",
+          "valueSets": "",
+          "implementationGuidance": "",
+          "informationType": "Record",
+          "type": "item",
+          "minimumMultiplicity": "0",
+          "maximumMultiplicity": "1",
+          "concept": [],
+          "relationshipType": "neither"
+        }
+      ],
       "relationshipType": "specialisation",
       "derivedFrom": "",
       "isComponent": false,
