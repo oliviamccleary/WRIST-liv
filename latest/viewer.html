@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Editor - oliviamccleary/WRIST-liv</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			overflow-x: hidden;
+		}
+		::-webkit-scrollbar {
+			display: none;
+		}
+		:root {
+			--blue-dark: rgb(30, 64, 88);
+			--grey-light: #f3f3f2;
+			--grey-mid: #8591a9;
+			--white-soft: #ffffff;
+		}
+		body,
+		input,
+		textarea,
+		label,
+		button {
+			font-family: "Segoe UI", sans-serif;
+			font-size: 14px;
+			color: var(--blue-dark);
+		}
+
+		/* Table Base */
+		table {
+			width: 100%;
+			table-layout: fixed;
+			border-collapse: collapse;
+			font-family: sans-serif;
+			font-size: 14px;
+			margin-top: 40px;
+		}
+		thead th {
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 2;
+			color: rgb(54, 75, 90);
+			font-weight: bold;
+			text-align: left;
+			vertical-align: top;
+			padding: 8px;
+			border: none;
+			word-wrap: break-word;
+		}
+		tbody td {
+			border: none;
+			margin-left: 10px;
+			padding: 8px;
+			text-align: left;
+			vertical-align: top;
+			word-wrap: break-word;
+		}
+		tbody tr[data-depth="0"] {
+			background: #004466 !important;
+			color: #fff;
+		}
+		tbody tr:not([data-depth="0"]) {
+			background: rgba(66, 110, 168, 0.09);
+			color: #000;
+			border-top: 1px solid #ccc;
+		}
+		tbody tr + tr {
+			border-top: 4px solid #fff;
+		}
+		tr.clickable {
+			cursor: pointer;
+		}
+
+		/* Sticky Header Utility */
+		.sticky-header {
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 2;
+		}
+
+		/* Truncate & Expand Arrows */
+		.truncate {
+			display: -webkit-box;
+			-webkit-line-clamp: 4;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+		.arrow {
+			display: inline-block;
+			width: 0.6em;
+			margin-right: 4px;
+			color: inherit;
+		}
+		tr[data-has-children="true"] .arrow::before {
+			content: "▶";
+			font-size: 0.8em;
+			transition: transform 0.2s;
+		}
+		tr.expanded .arrow::before {
+			content: "▼";
+		}
+
+		/* Row Highlighting & Deletion Animation */
+		tr.highlight-sticky {
+			background-color: #e6f7ff !important;
+			transition: background-color 0.5s ease;
+		}
+		tr.deletion-gap {
+			height: 10px;
+			background-color: #ffcccc;
+			animation: flash-fade 1s forwards;
+			transition: background-color 1s ease;
+		}
+		@keyframes flash-fade {
+			0% { background-color: #ff4d4d; }
+			100% { background-color: transparent; }
+		}
+		tr.empty-placeholder td {
+			background: #f8f8f8;
+			border-top: 2px dashed #ccc;
+		}
+
+		/* Cardinality Cell */
+		td.cardinality {
+			white-space: nowrap;
+			font-family: monospace;
+		}
+
+		/* Checkbox Column */
+		table th:nth-child(9),
+		table td:nth-child(9) {
+			width: 80px;
+			max-width: 80px;
+			padding: 8px 4px;
+			text-align: center;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+		table td:nth-child(9) input[type="checkbox"] {
+			margin: 0;
+			transform: scale(0.9);
+		}
+
+		/* Actions Column (Right Sticky) */
+		table th:nth-child(10) {
+			position: sticky;
+			top: 0;
+			right: 0;
+			z-index: 4;
+			background: #fff;
+		}
+		table td:nth-child(10) {
+			position: sticky;
+			right: 0;
+			z-index: 1;
+		}
+
+		/* Fixed Width for MRO Column */
+		table th:nth-child(1),
+		table td:nth-child(1) {
+			width: 60px;
+			max-width: 60px;
+			overflow: hidden;
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		/* Allow Name Column to Expand */
+		table th:nth-child(2),
+		table td:nth-child(2) {
+			width: auto;
+		}
+
+		.hidden {
+			display: none !important;
+		}
+
+		td, th {
+			word-break: break-word;
+			overflow-wrap: break-word;
+		}
+
+		/* Reduce the width of the information type column */
+		table th:nth-child(6),
+		table td:nth-child(6) ,
+		table th:nth-child(7),
+		table td:nth-child(7),
+		table th:nth-child(8),
+		table td:nth-child(8) {
+			width: 120px;
+			max-width: 120px;
+		}
+
+		table th:nth-child(9),
+		table td:nth-child(9) {
+			min-width: 140px;
+		}
+
+		thead th:nth-child(1) {
+ 			vertical-align: middle;
+			text-align: center;
+		}
+
+		/* Narrow the checkbox column properly */
+		table th:nth-child(9),
+		table td:nth-child(9) {
+			width: 80px;
+			max-width: 80px;
+			min-width: unset;
+		}
+
+		/* Widen the "Derived From" column (now column 9 in this setup) */
+		table th:nth-child(9),
+		table td:nth-child(9) {
+			width: 140px;
+			max-width: 140px;
+			white-space: normal;
+		}
+
+		table th,
+		table td {
+			word-break: break-word;
+			overflow-wrap: anywhere;
+		}
+
+		thead th {
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 2;
+			color: rgb(54, 75, 90);
+			font-weight: bold;
+			text-align: left;
+			vertical-align: middle; /* ✅ align all headers vertically */
+			padding: 8px;
+			border: none;
+			word-wrap: break-word;
+			height: 100%; /* optional for consistency */
+		}
+
+
+	</style>
+</head>
+<body>
+	<div style="max-height: 95vh; overflow-x: auto; overflow-y: auto;">
+		<table>
+			<thead>
+				<tr class="sticky-header">
+					<th>MRO</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Value Sets</th>
+					<th>Implementation Guidance</th>
+					<th>Information Type</th>
+					<th>Data Type</th>
+					<th>Cardinality</th>
+					<th>Derived From</th>
+				</tr>
+			</thead>
+			<tbody>
+				
+				
+				
+				
+				
+				<tr data-id="root-0" data-parent-id="" data-depth="0" data-has-children="true" class="">
+					<td style="padding-left: 0px;">M</td>
+					<td style="padding-left: 0px;">
+						<span class="arrow"></span>
+						<div class="truncate">Parent</div>
+					</td>
+					<td><div class="truncate" title="This is a parent item"><p>This is a parent item</p></div></td>
+					<td><div class="truncate"></div></td>
+					<td><div class="truncate" title="Use this like this"><p>Use this like this</p></div></td>
+					<td><div class="truncate">Record</div></td>
+					<td><div class="truncate"></div></td>
+					<td class="cardinality">0…1</td>
+					<td><div class="truncate"></div></td>
+				</tr>
+				
+					
+				
+				
+				
+				<tr data-id="root-0-0" data-parent-id="root-0" data-depth="1" data-has-children="false" class="hidden">
+					<td style="padding-left: 20px;">M</td>
+					<td style="padding-left: 20px;">
+						<span class="arrow"></span>
+						<div class="truncate">Child</div>
+					</td>
+					<td><div class="truncate" title="This is a child item"><p>This is a child item</p></div></td>
+					<td><div class="truncate"></div></td>
+					<td><div class="truncate" title="Use this like that"><p>Use this like that</p></div></td>
+					<td><div class="truncate">Record</div></td>
+					<td><div class="truncate"></div></td>
+					<td class="cardinality">0…1</td>
+					<td><div class="truncate"></div></td>
+				</tr>
+				
+				
+				
+				
+				
+				
+				
+				<tr data-id="root-1" data-parent-id="" data-depth="0" data-has-children="false" class="">
+					<td style="padding-left: 0px;">M</td>
+					<td style="padding-left: 0px;">
+						<span class="arrow"></span>
+						<div class="truncate">Item</div>
+					</td>
+					<td><div class="truncate" title=""></div></td>
+					<td><div class="truncate"></div></td>
+					<td><div class="truncate" title=""></div></td>
+					<td><div class="truncate">Record</div></td>
+					<td><div class="truncate"></div></td>
+					<td class="cardinality">0…1</td>
+					<td><div class="truncate"></div></td>
+				</tr>
+				
+				
+				
+			</tbody>
+		</table>
+	</div>
+
+	<script>
+		const data = {"component_sets": [{"id": "21522030f097adfe8937c6a942968e0f6161e790", "name": "WRIST-Test/WRIST-diabetes-record-information-standard"}, {"id": "1aecaf41b7d83bd7b98c8f0757ce86841740f03f", "name": "WRIST-Test/WRIST-111-referral"}, {"id": "31643bda1fa72c3604df6fd9e441db646eb21fe5", "name": "WRIST-Test/WRIST-wound-assessment-and-treatment"}], "concept": [{"concept": [{"concept": [], "derivedFrom": "", "description": "\u003cp\u003eThis is a child item\u003c/p\u003e", "implementationGuidance": "\u003cp\u003eUse this like that\u003c/p\u003e", "informationType": "Record", "isComponent": false, "maximumMultiplicity": "1", "minimumMultiplicity": "0", "mro": "M", "name": "Child", "relationshipType": "neither", "type": "item", "valueDomain": [{"type": "CD.CNE"}], "valueSets": ""}], "derivedFrom": "", "description": "\u003cp\u003eThis is a parent item\u003c/p\u003e", "implementationGuidance": "\u003cp\u003eUse this like this\u003c/p\u003e", "informationType": "Record", "isComponent": false, "maximumMultiplicity": "1", "minimumMultiplicity": "0", "mro": "M", "name": "Parent", "relationshipType": "specialisation", "type": "item", "valueDomain": [{"type": "CD"}], "valueSets": ""}, {"description": "", "implementationGuidance": "", "informationType": "Record", "maximumMultiplicity": "1", "minimumMultiplicity": "0", "mro": "M", "name": "Item", "type": "item", "valueSets": ""}], "description": "\u003cp\u003e\u003cbr\u003e\u003c/p\u003e", "name": "liv", "version": "1-build.0.0"};
+		document.addEventListener('DOMContentLoaded', () => {
+		const rows = Array.from(document.querySelectorAll('tr[data-id]'));
+
+		function toggleRows(pid, show) {
+			rows.forEach(r => {
+				if (r.getAttribute('data-parent-id') === pid) {
+					r.classList.toggle('hidden', !show);
+					if (!show) {
+						r.classList.remove('expanded');
+						toggleRows(r.getAttribute('data-id'), false);
+					}
+				}
+			});
+		}
+
+		rows.filter(r => r.getAttribute('data-has-children') === 'true').forEach(r => {
+			r.classList.add('clickable');
+			r.addEventListener('click', e => {
+				const clickedCell = e.target.closest('td');
+				if (!clickedCell) return; // ❗️ updated this line
+
+				const id = r.getAttribute('data-id');
+				const expanded = r.classList.toggle('expanded');
+				toggleRows(id, expanded);
+			});
+		});
+	});
+
+	</script>
+</body>
+</html>
