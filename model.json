@@ -29,17 +29,24 @@
       "maximumMultiplicity": "1",
       "concept": [
         {
-          "name": "New Item",
+          "name": "Child",
           "mro": "M",
-          "description": "",
+          "description": "<p>This is a child item</p>",
           "valueSets": "",
-          "implementationGuidance": "",
+          "implementationGuidance": "<p>Use this like that</p>",
           "informationType": "Record",
           "type": "item",
           "minimumMultiplicity": "0",
           "maximumMultiplicity": "1",
           "concept": [],
-          "relationshipType": "neither"
+          "relationshipType": "neither",
+          "derivedFrom": "",
+          "isComponent": false,
+          "valueDomain": [
+            {
+              "type": "ST"
+            }
+          ]
         }
       ],
       "relationshipType": "specialisation",
